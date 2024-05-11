@@ -1,5 +1,5 @@
 import flet as ft
-
+from flet import icons
 
 def main(page: ft.Page):
     page.title = "Flet counter example"
@@ -15,6 +15,17 @@ def main(page: ft.Page):
         txt_number.value = str(int(txt_number.value) + 1)
         page.update()
 
+    page.navigation_bar = ft.NavigationBar(
+        destinations=[
+            ft.NavigationDestination(
+            icon=icons.EXPLORE, label="Explore"
+        ),
+        ft.NavigationDestination(
+            icon=icons.BOOKMARK, label="Saved"
+        ),
+        ]
+        
+    )
     page.add(
         ft.Row(
             [
