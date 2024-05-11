@@ -1,19 +1,38 @@
 import flet as ft
 from flet import icons
+from yt_dlp import YoutubeDL as YDL
+
 
 def main(page: ft.Page):
     page.title = "Flet counter example"
     page.vertical_alignment = ft.MainAxisAlignment.CENTER
 
-    txt_number = ft.TextField(value="0", text_align=ft.TextAlign.RIGHT, width=100)
+    video_status = ft.TextField(value="Aún no has descargado ningún video",read_only=True,border=ft.InputBorder.NONE)
+    link_input = ft.TextField(label="Escribe el link de tu video", width=200)
 
-    def minus_click(e):
-        txt_number.value = str(int(txt_number.value) - 1)
-        page.update()
+    def progress_hook(d):
+        print(d)
+        if d['status'] == 'finished':
+            video_status.value = "Video descargado"
+            page.update()
+        else:
+            video_status.value = f"Descargando... {d['_percent_str']} a {d['_speed_str']}"
+            page.update()
+            
+            
+    def download_video(url):
+        dl_opts = {
+            'progress_hooks': [progress_hook],
+        }
+        with YDL(dl_opts) as ydl:
+            ydl.download([url])
 
-    def plus_click(e):
-        txt_number.value = str(int(txt_number.value) + 1)
-        page.update()
+    def download(e):
+        try:
+            download_video(str(link_input.value))
+        except:
+            video_status.value = "Link inválido"
+            page.update()
 
     page.navigation_bar = ft.NavigationBar(
         destinations=[
@@ -29,12 +48,17 @@ def main(page: ft.Page):
     page.add(
         ft.Row(
             [
-                ft.IconButton(ft.icons.REMOVE, on_click=minus_click),
-                txt_number,
-                ft.IconButton(ft.icons.ADD, on_click=plus_click),
+                link_input,
+                ft.IconButton(icons.CLOUD_DOWNLOAD, on_click=download),
             ],
             alignment=ft.MainAxisAlignment.CENTER,
-        )
+        ),
+        ft.Row(
+            [
+                video_status
+            ],
+            alignment=ft.MainAxisAlignment.CENTER,
+        ),
     )
 
 
