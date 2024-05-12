@@ -1,5 +1,5 @@
 import flet as ft
-import json
+import shutil
 from flet import icons
 from yt_dlp import YoutubeDL as YDL
 
@@ -43,8 +43,16 @@ def main(page: ft.Page):
         with YDL() as ydl:
             ydl.add_progress_hook(progress_hook)
             ydl.build_format_selector(format_spec='1080x1920+bestaudio/best')
+            ydl.format_resolution(format='1080x1920+bestaudio/best')
             info = ydl.extract_info(url,download=False)
+            filename = ydl.prepare_filename(info)
             ydl.download([url])
+            oldpath = ydl.get_output_path()
+            filepicker = ft.FilePicker(dialog_title="Selecciona la carpeta de descarga")
+            result = filepicker.save_file(filename=filename,file_type="MEDIA")
+            newpath = result.path
+            shutil.move(oldpath,newpath)
+            ##page.launch_url(path)
             thumbails = info.get('thumbnails', [])
             for thumb in thumbails:
                 if 'resolution' not in thumb:
@@ -54,7 +62,7 @@ def main(page: ft.Page):
                 page.add(
                     ft.Row(
                         [
-                            ft.Image(thumb['url'], width=200, height=200),
+                            ft.Image(thumb['url'], width=200, height=200,border_radius=ft.border_radius.all(10)),
                             ft.Text(info['title'],width=200,overflow=ft.TextOverflow.ELLIPSIS, max_lines=4)
                         ],
                         alignment=ft.MainAxisAlignment.CENTER,
