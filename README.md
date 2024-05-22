@@ -1,8 +1,9 @@
-# A minif Flet app
+# Aplicación para descargar videos de youtube
 
-An example of a counter Flet app.
+Esta es una aplicación en desarrollo para la descarga de videos.
+Se utiliza el módulo yt-dlp de python y el framework flet
 
-To run the app:
+Para correr la aplicación:
 
 ```
 flet run [app_directory]
